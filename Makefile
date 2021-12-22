@@ -14,6 +14,43 @@ docker-up:
 docker-down:
 	docker-compose down --remove-orphans
 
+exec:
+	docker-compose exec php bash
+
+#-----------------------------------------------------------
+# Setup
+setup: composer-install yarn-install run-dev
+
+#-----------------------------------------------------------
+# composer
+composer-install:
+	docker-compose exec php composer install
+	docker-compose exec php composer req symfony/webpack-encore-bundle
+composer-update:
+	docker-compose exec php composer update
+
+#-----------------------------------------------------------
+# yarn
+yarn-install:
+	docker-compose exec php yarn install
+run-dev:
+	docker-compose exec php yarn encore dev
+run-watch:
+	docker-compose exec php yarn encore dev --watch
+
+#-----------------------------------------------------------
+# doctrine
+db-dul: db-drop db-update db-load
+
+db-drop:
+	docker-compose exec php bin/console doctrine:schema:drop --full-database --force
+
+db-update:
+	docker-compose exec php bin/console doctrine:schema:update --force
+
+db-load:
+	docker-compose exec php bin/console doctrine:fixtures:load -n
+
 #-----------------------------------------------------------
 # for local
 stop-local-services:
